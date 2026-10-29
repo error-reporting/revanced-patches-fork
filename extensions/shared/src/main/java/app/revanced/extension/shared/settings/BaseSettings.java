@@ -9,6 +9,7 @@ import app.revanced.extension.shared.innertube.client.YouTubeClient.ClientType;
 import app.revanced.extension.shared.patches.ReturnYouTubeUsernamePatch.DisplayFormat;
 import app.revanced.extension.shared.patches.WatchHistoryPatch.WatchHistoryType;
 import app.revanced.extension.shared.patches.spoof.SpoofStreamingDataPatch.ClientAndroidVRAvailability;
+import app.revanced.extension.shared.patches.spoof.SpoofStreamingDataPatch.ClientVisionOSAvailability;
 import app.revanced.extension.shared.patches.spoof.SpoofStreamingDataPatch.ClientJSAvailability;
 import app.revanced.extension.shared.patches.spoof.SpoofStreamingDataPatch.J2V8Availability;
 import app.revanced.extension.shared.patches.spoof.SpoofStreamingDataPatch.ShowReloadVideoButtonAvailability;
@@ -37,7 +38,8 @@ public class BaseSettings {
 
     public static final BooleanSetting SPOOF_STREAMING_DATA_ANDROID_VR_ENABLE_AV1_CODEC = new BooleanSetting("revanced_spoof_streaming_data_android_vr_enable_av1_codec", FALSE, true,
             "revanced_spoof_streaming_data_android_vr_enable_av1_codec_user_dialog_message", new ClientAndroidVRAvailability());
-
+    public static final BooleanSetting SPOOF_STREAMING_DATA_VISIONOS_ENABLE_AV1_CODEC = new BooleanSetting("revanced_spoof_streaming_data_visionos_enable_av1_codec", FALSE, true,
+            "revanced_spoof_streaming_data_visionos_enable_av1_codec_user_dialog_message", new ClientVisionOSAvailability());
     public static final BooleanSetting SPOOF_STREAMING_DATA_USE_JS = new BooleanSetting("revanced_spoof_streaming_data_use_js", !IS_YOUTUBE, true,
             "revanced_spoof_streaming_data_use_js_user_dialog_message", new J2V8Availability());
     public static final BooleanSetting SPOOF_STREAMING_DATA_USE_JS_ALL = new BooleanSetting("revanced_spoof_streaming_data_use_js_all", FALSE, true, new ClientJSAvailability());
@@ -45,7 +47,7 @@ public class BaseSettings {
 
     // Client type must be last spoof setting due to cyclic references.
     public static final EnumSetting<ClientType> SPOOF_STREAMING_DATA_DEFAULT_CLIENT = new EnumSetting<>("revanced_spoof_streaming_data_default_client",
-            IS_YOUTUBE ? ClientType.ANDROID_NO_SDK : ClientType.ANDROID_MUSIC_NO_SDK, true, parent(SPOOF_STREAMING_DATA));
+            IS_YOUTUBE ? ClientType.VISIONOS : ClientType.ANDROID_MUSIC_NO_SDK, true, parent(SPOOF_STREAMING_DATA));
 
     public static final BooleanSetting ENABLE_COMMENTS_SCROLL_TOP = new BooleanSetting("revanced_enable_comments_scroll_top", FALSE, true);
     public static final BooleanSetting DISABLE_AUTO_AUDIO_TRACKS = new BooleanSetting("revanced_disable_auto_audio_tracks", TRUE);
