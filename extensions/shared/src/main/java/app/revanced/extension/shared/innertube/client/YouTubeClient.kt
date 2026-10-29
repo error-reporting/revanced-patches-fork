@@ -61,7 +61,7 @@ object YouTubeClient {
      * Uses non adaptive bitrate.
      */
     private const val PACKAGE_NAME_ANDROID_MUSIC = "com.google.android.apps.youtube.music"
-    private const val CLIENT_VERSION_ANDROID_MUSIC_NO_SDK = "7.12.52"
+    private const val CLIENT_VERSION_ANDROID_MUSIC_NO_SDK = "7.29.52"
     private const val DEVICE_MODEL_ANDROID_MUSIC_NO_SDK = ""
     private const val DEVICE_MAKE_ANDROID_MUSIC_NO_SDK = ""
     private val OS_VERSION_ANDROID_MUSIC_NO_SDK = Build.VERSION.RELEASE
@@ -90,7 +90,7 @@ object YouTubeClient {
      * [the App Store page of the YouTube app](https://www.meta.com/en-us/experiences/2002317119880945/),
      * in the `Additional details` section.
      */
-    private val CLIENT_VERSION_ANDROID_VR = if (useAV1())
+    private val CLIENT_VERSION_ANDROID_VR = if (useAndroidVRAV1())
         // Lowest version that supports AV1.
         // According to the changelog, only Quest 3 supports the AV1 codec in this version.
         // Cronet version: 122.0.6238.3
@@ -99,22 +99,22 @@ object YouTubeClient {
         // Cronet version: 113.0.5672.24
         "1.47.48"
 
-    private val DEVICE_MODEL_ANDROID_VR = if (useAV1())
+    private val DEVICE_MODEL_ANDROID_VR = if (useAndroidVRAV1())
         // https://dumps.tadiphone.dev/dumps/oculus/eureka
         "Quest 3"
     else
         // https://dumps.tadiphone.dev/dumps/oculus/monterey
         "Quest"
     private const val DEVICE_MAKE_ANDROID_VR = "Oculus"
-    private val OS_VERSION_ANDROID_VR = if (useAV1())
+    private val OS_VERSION_ANDROID_VR = if (useAndroidVRAV1())
         "14"
     else
         "10"
-    private val ANDROID_SDK_VERSION_ANDROID_VR = if (useAV1())
+    private val ANDROID_SDK_VERSION_ANDROID_VR = if (useAndroidVRAV1())
         "34"
     else
         "29"
-    private val BUILD_ID_ANDROID_VR = if (useAV1())
+    private val BUILD_ID_ANDROID_VR = if (useAndroidVRAV1())
         "UP1A.231005.007.A1"
     else
         "QQ3A.200805.001"
@@ -136,7 +136,8 @@ object YouTubeClient {
      * 360° VR immersive mode is not available.
      */
     private const val PACKAGE_NAME_ANDROID_CREATOR = "com.google.android.apps.youtube.creator"
-    private const val CLIENT_VERSION_ANDROID_CREATOR = "24.01.000"
+    // Cronet version: 144.0.7509.3
+    private const val CLIENT_VERSION_ANDROID_CREATOR = "25.51.100"
 
     /**
      * The device machine id for the Google Pixel 7a.
@@ -158,13 +159,22 @@ object YouTubeClient {
 
 
     // VISION OS
-    private const val CLIENT_VERSION_VISIONOS = "0.1"
+    private const val PACKAGE_NAME_VISIONOS = "com.google.visionosyoutube"
+    private val CLIENT_VERSION_VISIONOS = if (useVisionOSAV1())
+        "1.03"
+    else
+        "1.02"
     private const val DEVICE_MAKE_VISIONOS = "Apple"
-    private const val DEVICE_MODEL_VISIONOS = "RealityDevice14,1"
+    private val DEVICE_MODEL_VISIONOS = if (useVisionOSAV1())
+        "RealityDevice17,1"
+    else
+        "RealityDevice14,1"
     private const val OS_NAME_VISIONOS = "visionOS"
-    private const val OS_VERSION_VISIONS = "1.3.21O771"
-    private const val USER_AGENT_VISIONOS =
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
+    private const val OS_VERSION_VISIONS = "26.6.23O780"
+    private val USER_AGENT_VISIONOS = if (useVisionOSAV1())
+        "com.google.visionosyoutube/1.03 (RealityDevice17,1; U; CPU visionOS 26_6_1 like Mac OS X; en_US) gzip"
+    else
+        "com.google.visionosyoutube/1.02 (RealityDevice14,1; U; CPU visionOS 26_6_1 like Mac OS X; en_US) gzip"
 
 
     // TVHTML5
@@ -256,9 +266,13 @@ object YouTubeClient {
     ): String =
         "$packageName/$clientVersion(Linux; U; Android $osVersion; ${Locale.getDefault()}; $deviceModel Build/$buildId) gzip"
 
-    private fun useAV1(): Boolean {
+    private fun useAndroidVRAV1(): Boolean {
         return BaseSettings.SPOOF_STREAMING_DATA_ANDROID_VR_ENABLE_AV1_CODEC.get()
     }
+    private fun useVisionOSAV1(): Boolean {
+        return BaseSettings.SPOOF_STREAMING_DATA_VISIONOS_ENABLE_AV1_CODEC.get()
+    }
+
 
     private fun useJS(): Boolean {
         return supportJ2V8() && BaseSettings.SPOOF_STREAMING_DATA_USE_JS.get()
@@ -431,7 +445,7 @@ object YouTubeClient {
             clientVersion = CLIENT_VERSION_ANDROID_VR,
             supportsCookies = false,
             clientName = "ANDROID_VR",
-            friendlyName = if (useAV1())
+            friendlyName = if (useAndroidVRAV1())
                 "Android VR AV1"
             else
                 "Android VR"
@@ -458,10 +472,13 @@ object YouTubeClient {
             osVersion = OS_VERSION_VISIONS,
             userAgent = USER_AGENT_VISIONOS,
             clientVersion = CLIENT_VERSION_VISIONOS,
-            clientPlatform = CLIENT_PLATFORM_DESKTOP,
             supportsCookies = false,
+            supportsMultiAudioTracks = true,
             clientName = "VISIONOS",
-            friendlyName = "visionOS"
+            friendlyName = if (useVisionOSAV1()) 
+                "VisionOS AV1"
+            else
+                "VisionOS"
         ),
         TV(
             id = 7,
@@ -542,31 +559,31 @@ object YouTubeClient {
 
         companion object {
             val CLIENT_ORDER_TO_USE_YOUTUBE: Array<ClientType> = arrayOf(
-                ANDROID_NO_SDK,
                 VISIONOS,
                 ANDROID_VR,
                 ANDROID_CREATOR,
+                ANDROID_NO_SDK,
             )
             val CLIENT_ORDER_TO_USE_JS_YOUTUBE: Array<ClientType> = arrayOf(
-                ANDROID_NO_SDK,
                 VISIONOS,
                 ANDROID_VR,
                 ANDROID_CREATOR,
+                ANDROID_NO_SDK,
                 TV_SIMPLY,
                 TV_LEGACY,
                 TV,
             )
             val CLIENT_ORDER_TO_USE_YOUTUBE_MUSIC: Array<ClientType> = arrayOf(
                 ANDROID_MUSIC_NO_SDK,
-                ANDROID_NO_SDK,
                 VISIONOS,
                 ANDROID_VR,
+                ANDROID_NO_SDK,
             )
             val CLIENT_ORDER_TO_USE_JS_YOUTUBE_MUSIC: Array<ClientType> = arrayOf(
                 ANDROID_MUSIC_NO_SDK,
-                ANDROID_NO_SDK,
                 VISIONOS,
                 ANDROID_VR,
+                ANDROID_NO_SDK,
                 TV_SIMPLY,
                 TV_LEGACY,
                 TV,
