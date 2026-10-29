@@ -390,6 +390,19 @@ public class SpoofStreamingDataPatch {
         }
     }
 
+    public static final class ClientVisionOSAvailability implements Setting.Availability {
+        @Override
+        public boolean isAvailable() {
+            return BaseSettings.SPOOF_STREAMING_DATA.get() &&
+                    BaseSettings.SPOOF_STREAMING_DATA_DEFAULT_CLIENT.get().name().startsWith("VISIONOS");
+        }
+
+        @Override
+        public List<Setting<?>> getParentSettings() {
+            return List.of(BaseSettings.SPOOF_STREAMING_DATA);
+        }
+    }
+    
     public static final class ClientJSAvailability implements Setting.Availability {
         @Override
         public boolean isAvailable() {
