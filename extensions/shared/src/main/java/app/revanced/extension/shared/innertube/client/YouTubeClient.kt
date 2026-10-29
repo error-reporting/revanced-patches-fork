@@ -430,7 +430,7 @@ object YouTubeClient {
             androidSdkVersion = ANDROID_SDK_VERSION_ANDROID_VR,
             clientVersion = CLIENT_VERSION_ANDROID_VR,
             clientName = "ANDROID_VR",
-            friendlyName = if (useAV1())
+            friendlyName = if (useAndroidVRAV1())
                 "Android VR AV1"
             else
                 "Android VR"
